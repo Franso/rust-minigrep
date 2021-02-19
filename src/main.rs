@@ -4,6 +4,7 @@
 // We then collect all the values into a vector using  the collect method
 
 use std::env;
+use std::error::Error;
 use std::fs;
 use std::process;
 
@@ -24,13 +25,24 @@ fn main() {
     println!("Searching for {}", config.query);
     println!("In file {}", config.filename);
 
-    // 2. Read from the file entered
-
-    let contents =
-        fs::read_to_string(config.filename).expect("something went wrong reading the file");
-
-    println!("With text:\n{}", contents);
+    // handle any errors that might come from the run function
+    if let Err(e) = run(config) {
+        println!("Application error: {}", e);
+        process::exit(1);
+    }
 }
+
+// 2. Read from the file entered
+// return type is the unit type () o in the case of an error the trait obect Box<dyn Error>
+// Box<dyn Error> means that the function will return a type that implements the Error trait
+// dynamic means we dont know the type
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    // ? will return the error value from the current function for the caller to handle
+    let contents = fs::read_to_string(config.filename)?;
+    println!("With text:\n{}", contents);
+    Ok(())
+}
+
 // the struct Config will hold the two arguments
 // This glues together our data into a reusable obj rather than going the primitive obsession way
 struct Config {
