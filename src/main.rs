@@ -10,14 +10,15 @@ use minigrep::Config;
 
 fn main() {
     //collect cli arguments into a vector named args
-    let args: Vec<String> = env::args().collect();
+    // let args: Vec<String> = env::args().collect();
 
     // Creating a new instance of Config
     // in case we have less than two args the err from the new module in Config raises an error
-    let config = Config::new(&args).unwrap_or_else(|err| {
+    let config = Config::new(env::args()).unwrap_or_else(|err| {
         // this anonymous function is called a closure
         // unwrap_or_else creates a custom non-panic error handling
-        println!("Problem parsing arguments: {}", err);
+        // use eprintln! so that the messages are printed to the standard error stream
+        eprintln!("Problem parsing arguments: {}", err);
         // process::exit will stop the program immediately and return the number that was passed as the exit status code
         process::exit(1);
     });
@@ -28,7 +29,7 @@ fn main() {
     // 2. Read from the file entered
     // handle any errors that might come from the file reading (run)function
     if let Err(e) = minigrep::run(config) {
-        println!("Application error: {}", e);
+        eprintln!("Application error: {}", e);
         process::exit(1);
     }
 }
